@@ -6,6 +6,8 @@
 
 发布日志参见 `RELEASE.md` 文档
 
+整合spring案例见本项目中的rpc-sample模块,整合springboot见rpc-springboot仓库
+
 ## 定义 RPC 接口
 
 > 参见 rpc-sample-api 模块
