@@ -18,30 +18,13 @@ public class RedisServiceDiscover implements ServiceDiscovery{
     @Override
     public String discover(String serviceName) {
         try{
-            if (this.jedis.get(serviceName) != null){
-                return jedis.get(serviceName);
+            if (this.jedis.smembers(serviceName) != null){
+                return jedis.srandmember(serviceName);
             }
         } catch (Throwable t){
             LOGGER.error("Failed to subscribe service from redis registry. registry: " + jedis + ", service: " + serviceName + ", cause: " + t.getMessage(), t);
 
         }
-//        for (Map.Entry<String, JedisPool> entry : RedisServiceRegister.getJedisPools().entrySet()) {
-//            JedisPool jedisPool = entry.getValue();
-//            try {
-//                Jedis jedis = jedisPool.getResource();
-//                try {
-//                    if (jedis.get(serviceName) != null){
-//                        return jedis.get(serviceName);
-//                    } else {
-//                        continue;
-//                    }
-//                } finally {
-//                    jedis.close();
-//                }
-//            } catch (Throwable t) { // Try the next server
-//                LOGGER.error("Failed to subscribe service from redis registry. registry: " + entry.getKey() + ", service: " + serviceName + ", cause: " + t.getMessage(), t);
-//            }
-//        }
         return null;
     }
 }

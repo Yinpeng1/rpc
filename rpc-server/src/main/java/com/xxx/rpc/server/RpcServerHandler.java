@@ -37,8 +37,8 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
         if (obj instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) obj;
             if (IdleState.READER_IDLE.equals(event.state())) {  //如果读通道处于空闲状态，说明没有接收到心跳命令
-                System.out.println("已经5秒没有接收到客户端的信息了");
-                System.out.println("关闭这个不活跃的channel");
+//                System.out.println("已经5秒没有接收到客户端的信息了");
+//                System.out.println("关闭这个不活跃的channel");
                 ctx.channel().close();
             }
         } else {
