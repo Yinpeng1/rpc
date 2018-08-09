@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.xxx.rpc.sample.server"/>
+
+    <context:property-placeholder location="classpath:rpc.properties"/>
+
+    <bean id="jedis" class="redis.clients.jedis.Jedis">
+        <constructor-arg name="host" value="47.98.102.190" />
+        <constructor-arg name="port" value="6379"/>
+    </bean>
+
+    <!--<bean id="serviceRegistry" class="com.xxx.rpc.registry.zookeeper.ZooKeeperServiceRegistry">-->
+        <!--<constructor-arg name="zkAddress" value="${rpc.registry_address}"/>-->
+    <!--</bean>-->
+
+    <bean id="serviceRegistry" class="com.yp.rpc.register.redis.RedisServiceRegister">
+        <constructor-arg name="jedis" ref="jedis" />
+    </bean>
+
+    <bean id="rpcServer" class="com.xxx.rpc.server.RpcServer">
+        <constructor-arg name="serviceAddress" value="${rpc.service_address}"/>
+        <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
+    </bean>
+
+</beans>
