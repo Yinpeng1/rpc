@@ -21,7 +21,7 @@
     <!--</bean>-->
 
     <bean id="serviceRegistry" class="com.yp.rpc.register.redis.RedisServiceRegister">
-        <constructor-arg name="jedis" ref="jedis" />
+        <constructor-arg name="redisAddress" value="47.98.102.190:6379" />
     </bean>
 
     <bean id="rpcServer" class="com.xxx.rpc.server.RpcServer">

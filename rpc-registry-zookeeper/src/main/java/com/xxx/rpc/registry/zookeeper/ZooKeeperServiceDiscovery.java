@@ -21,15 +21,17 @@ public class ZooKeeperServiceDiscovery implements ServiceDiscovery {
 
     private String zkAddress;
 
+    private ZkClient zkClient;
+
     public ZooKeeperServiceDiscovery(String zkAddress) {
         this.zkAddress = zkAddress;
     }
 
     @Override
     public String discover(String name) {
-        // 创建 ZooKeeper 客户端
-        ZkClient zkClient = new ZkClient(zkAddress, Constant.ZK_SESSION_TIMEOUT, Constant.ZK_CONNECTION_TIMEOUT);
         LOGGER.debug("connect zookeeper");
+        // 创建 ZooKeeper 客户端
+        this.zkClient = new ZkClient(zkAddress, Constant.ZK_SESSION_TIMEOUT, Constant.ZK_CONNECTION_TIMEOUT);
         try {
             // 获取 service 节点
             String servicePath = Constant.ZK_REGISTRY_PATH + "/" + name;

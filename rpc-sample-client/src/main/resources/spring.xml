@@ -9,11 +9,11 @@
 
     <context:property-placeholder location="classpath:rpc.properties"/>
 
-    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxIdle" value="300"/> <!--最大能够保持idel状态的对象数-->
-        <property name="maxTotal" value="60000"/><!--最大分配的对象数-->
-        <property name="testOnBorrow" value="true"/><!--当调用borrow Oject方法时，是否进行有效性检查-->
-    </bean>
+    <!--<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">-->
+        <!--<property name="maxIdle" value="300"/> &lt;!&ndash;最大能够保持idel状态的对象数&ndash;&gt;-->
+        <!--<property name="maxTotal" value="60000"/>&lt;!&ndash;最大分配的对象数&ndash;&gt;-->
+        <!--<property name="testOnBorrow" value="true"/>&lt;!&ndash;当调用borrow Oject方法时，是否进行有效性检查&ndash;&gt;-->
+    <!--</bean>-->
 
     <bean id="jedis" class="redis.clients.jedis.Jedis">
         <constructor-arg name="host" value="47.98.102.190" />
@@ -26,7 +26,7 @@
 
 
     <bean id="serviceDiscovery" class="com.yp.rpc.register.redis.RedisServiceDiscover">
-        <constructor-arg name="jedis" ref="jedis"/>
+        <constructor-arg name="redisAddress" value="47.98.102.190:6379"/>
     </bean>
 
 

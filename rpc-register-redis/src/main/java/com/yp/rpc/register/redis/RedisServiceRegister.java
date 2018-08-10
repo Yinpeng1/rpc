@@ -17,44 +17,43 @@ public class RedisServiceRegister implements ServiceRegistry {
 
     private final ScheduledExecutorService expireExecutor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
-    private Map<String, JedisPool> jedisPool = new ConcurrentHashMap();
+    private Map<String, JedisPool> jedisPools = new ConcurrentHashMap<>();
 
-    private Jedis jedis;
-
-    public RedisServiceRegister(Jedis jedis) {
-        this.jedis = jedis;
+    public RedisServiceRegister(String redisAddress) {
+        if (redisAddress != null){
+            for (int i = 0; i < redisAddress.split(",").length; i++) {
+                //map的key为redis服务器地址和端口
+                jedisPools.put(redisAddress.split(",")[i], new JedisPool(redisAddress.split(",")[i].split(":")[0], Integer.valueOf(redisAddress.split(",")[i].split(":")[1])));
+            }
+        }
         LOGGER.info("start the redis server register");
         expireExecutor.scheduleWithFixedDelay(() -> {
             try {
-                if (jedis.keys("*") != null){
-                    /**拿到所有的key*/
-                    for (String s : jedis.keys("*")){
-                        if (jedis.type(s).equals("set")){
-                            for (String t :jedis.smembers(s)){
-                                RpcRequest request = new RpcRequest();
-                                request.setCheckStatus(true);
-                                HeartCheckProxy rpcProxy = new HeartCheckProxy();
-                                Object result = rpcProxy.checkHeartBreak(request, t.split(":")[0], Integer.valueOf(t.split(":")[1]));
-                                if (result == null || !(result.toString()).equals(Constant.status)){
-                                    jedis.srem(s, t);
-                                    LOGGER.info("send heartbreak to serviceName {} address {} fail and it will be delete", s, t);
+                for (Map.Entry<String, JedisPool> entry : jedisPools.entrySet()) {
+                    JedisPool jedisPool = entry.getValue();
+                    Jedis jedis = jedisPool.getResource();
+                    try {
+                        if (jedis.keys("*") != null){
+                            /**拿到所有的key*/
+                            for (String s : jedis.keys("*")){
+                                if (jedis.type(s).equals("set")){
+                                    for (String t :jedis.smembers(s)){
+                                        RpcRequest request = new RpcRequest();
+                                        request.setCheckStatus(true);
+                                        HeartCheckProxy rpcProxy = new HeartCheckProxy();
+                                        Object result = rpcProxy.checkHeartBreak(request, t.split(":")[0], Integer.valueOf(t.split(":")[1]));
+                                        if (result == null || !(result.toString()).equals(Constant.status)){
+                                            jedis.srem(s, t);
+                                            LOGGER.info("send heartbreak to serviceName {} address {} fail and it will be delete", s, t);
+                                        }
+                                    }
                                 }
                             }
                         }
+                    }finally {
+                     jedis.close();
                     }
                 }
-//                if (jedis.hkeys(Constant.REDIS_KEY) != null){
-//                    for (String field : jedis.hkeys(Constant.REDIS_KEY)){
-//                        RpcRequest request = new RpcRequest();
-//                        request.setCheckStatus(true);
-//                        HeartCheckProxy rpcProxy = new HeartCheckProxy();
-//                        String result = rpcProxy.checkHeartBreak(request, jedis.hget(Constant.REDIS_KEY, field).split(":")[0], Integer.valueOf(jedis.hget(Constant.REDIS_KEY, field).split(":")[1])).toString();
-//                        if (!result.equals(Constant.status)){
-//                            jedis.hdel(Constant.REDIS_KEY, jedis.hget(Constant.REDIS_KEY, field).split(":")[0]);
-//                            LOGGER.info("send heartbreak to serviceName {} address {} fail and it will be delete", jedis.hget(Constant.REDIS_KEY, field).split(":")[0]);
-//                        }
-//                    }
-//                }
             }catch (Throwable e){
                 LOGGER.error("schedule check service thread start error because {}", e);
             }
@@ -64,11 +63,18 @@ public class RedisServiceRegister implements ServiceRegistry {
     @Override
     public void register(String serviceName, String serviceAddress) {
         try {
-            jedis.sadd(serviceName, serviceAddress);
-            LOGGER.info("new service is registering serviceName {} serviceAddress {} ", serviceName, serviceAddress);
-//            jedis.hset("register", key, value);
+            for (Map.Entry<String, JedisPool> entry : jedisPools.entrySet()) {
+                JedisPool jedisPool = entry.getValue();
+                Jedis jedis = jedisPool.getResource();
+                try {
+                    jedis.sadd(serviceName, serviceAddress);
+                    LOGGER.info("new service is registering serviceName {} serviceAddress {} ", serviceName, serviceAddress);
+                } finally {
+                    jedis.close();
+                }
+            }
         }catch (Throwable t){
-            LOGGER.debug("Failed to register service to redis registry. registry: " + jedis + ", service: " + serviceName + ", cause: " + t.getMessage(), t);
+            LOGGER.debug("Failed to register service to redis registry service: " + serviceName + ", cause: " + t.getMessage(), t);
         }
     }
 

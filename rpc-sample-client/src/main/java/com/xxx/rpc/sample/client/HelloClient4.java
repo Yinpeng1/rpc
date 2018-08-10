@@ -8,6 +8,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class HelloClient4 {
 
@@ -19,7 +20,7 @@ public class HelloClient4 {
         int loopCount = 100;
 
         ExecutorService executor = Executors.newFixedThreadPool(threadNum);
-        final CountDownLatch latch = new CountDownLatch(loopCount);
+//        final CountDownLatch latch = new CountDownLatch(loopCount);
 
         try {
             long start = System.currentTimeMillis();
@@ -31,11 +32,11 @@ public class HelloClient4 {
                         HelloService helloService = rpcProxy.create(HelloService.class);
                         String result = helloService.hello("World");
                         System.out.println(result);
-                        latch.countDown();
                     }
                 });
             }
-            latch.await();
+            executor.shutdown();
+            executor.awaitTermination(100000, TimeUnit.SECONDS);
 
             long time = System.currentTimeMillis() - start;
             System.out.println("thread: " + threadNum);
