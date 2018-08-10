@@ -21,6 +21,10 @@
             <artifactId>rpc-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
         <!-- RPC Registry with ZooKeeper -->
         <dependency>
             <groupId>com.xxx.rpc</groupId>
