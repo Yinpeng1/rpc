@@ -34,7 +34,9 @@ public class RedisServiceDiscover implements ServiceDiscovery{
                 Jedis jedis = jedisPool.getResource();
                 try{
                     if (jedis.smembers(serviceName) != null){
-                        return jedis.srandmember(serviceName);
+                        String address = jedis.srandmember(serviceName);
+                        LOGGER.info("use service address {}", address);
+                        return address;
                     }
                 } catch (Throwable t){
                     LOGGER.error("Failed to discover service from redis registry. registry: " + jedis + ", service: " + serviceName + ", cause: " + t.getMessage(), t);
