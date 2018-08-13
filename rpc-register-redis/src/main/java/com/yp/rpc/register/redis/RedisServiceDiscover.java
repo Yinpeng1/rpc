@@ -43,7 +43,7 @@ public class RedisServiceDiscover implements ServiceDiscovery{
                 }
             }
         } catch (Throwable t){
-            LOGGER.error("map is null");
+            throw new RuntimeException("jedis pool is unuseable");
         }
         return null;
     }
