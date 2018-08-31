@@ -100,7 +100,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
                     LOGGER.debug("register service: {} => {}", interfaceName, serviceAddress);
                 }
             }
-            LOGGER.debug("server started on port {}", port);
+            LOGGER.info("server started on port {}", port);
             // 关闭 RPC 服务器
             future.channel().closeFuture().sync();
         } finally {

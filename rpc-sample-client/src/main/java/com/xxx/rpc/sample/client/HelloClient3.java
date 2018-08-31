@@ -18,12 +18,12 @@ public class HelloClient3 {
 
     public static void main(String[] args) throws Exception {
 
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
         ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
         RpcProxy rpcProxy = context.getBean(RpcProxy.class);
         HelloService helloService = rpcProxy.create(HelloService.class);
 
-        int loopCount = 500;
+        int loopCount = 100;
 
 
         long start = System.currentTimeMillis();

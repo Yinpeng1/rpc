@@ -11,18 +11,18 @@
 
     <context:property-placeholder location="classpath:rpc.properties"/>
 
-    <bean id="jedis" class="redis.clients.jedis.Jedis">
-        <constructor-arg name="host" value="47.98.102.190" />
-        <constructor-arg name="port" value="6379"/>
-    </bean>
-
-    <!--<bean id="serviceRegistry" class="com.xxx.rpc.registry.zookeeper.ZooKeeperServiceRegistry">-->
-        <!--<constructor-arg name="zkAddress" value="${rpc.registry_address}"/>-->
+    <!--<bean id="jedis" class="redis.clients.jedis.Jedis">-->
+        <!--<constructor-arg name="host" value="47.98.102.190" />-->
+        <!--<constructor-arg name="port" value="6379"/>-->
     <!--</bean>-->
 
-    <bean id="serviceRegistry" class="com.yp.rpc.register.redis.RedisServiceRegister">
-        <constructor-arg name="redisAddress" value="47.98.102.190:6379" />
+    <bean id="serviceRegistry" class="com.xxx.rpc.registry.zookeeper.ZooKeeperServiceRegistry">
+        <constructor-arg name="zkAddress" value="${rpc.registry_address}"/>
     </bean>
+
+    <!--<bean id="serviceRegistry" class="com.yp.rpc.register.redis.RedisServiceRegister">-->
+        <!--<constructor-arg name="redisAddress" value="47.98.102.190:6379" />-->
+    <!--</bean>-->
 
     <bean id="rpcServer" class="com.xxx.rpc.server.RpcServer">
         <constructor-arg name="serviceAddress" value="${rpc.service_address}"/>

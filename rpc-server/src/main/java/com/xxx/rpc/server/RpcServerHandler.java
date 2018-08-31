@@ -14,6 +14,7 @@ import net.sf.cglib.reflect.FastMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -81,6 +82,11 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
         String methodName = request.getMethodName();
         Class<?>[] parameterTypes = request.getParameterTypes();
         Object[] parameters = request.getParameters();
+//        for (Method method:serviceClass.getDeclaredMethods()) {
+//            if (method.getName().equals(methodName)){
+//                method.invoke(serviceBean, parameters);
+//            }
+//        }
         // 执行反射调用
 //        Method method = serviceClass.getMethod(methodName, parameterTypes);
 //        method.setAccessible(true);

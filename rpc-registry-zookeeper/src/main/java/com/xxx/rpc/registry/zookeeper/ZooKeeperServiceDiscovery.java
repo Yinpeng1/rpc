@@ -2,11 +2,13 @@ package com.xxx.rpc.registry.zookeeper;
 
 import com.xxx.rpc.common.util.CollectionUtil;
 import com.xxx.rpc.registry.ServiceDiscovery;
+import com.xxx.rpc.registry.zookeeper.zkpool.ZKClientPool;
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -19,19 +21,25 @@ public class ZooKeeperServiceDiscovery implements ServiceDiscovery {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZooKeeperServiceDiscovery.class);
 
+    private static int MAX_SIZE = 10;
+
     private String zkAddress;
 
     private ZkClient zkClient;
 
+    private ZKClientPool zkClientPool;
+
     public ZooKeeperServiceDiscovery(String zkAddress) {
         this.zkAddress = zkAddress;
+        zkClientPool = new ZKClientPool(zkAddress, MAX_SIZE);
     }
 
     @Override
     public String discover(String name) {
         LOGGER.debug("connect zookeeper");
         // 创建 ZooKeeper 客户端
-        this.zkClient = new ZkClient(zkAddress, Constant.ZK_SESSION_TIMEOUT, Constant.ZK_CONNECTION_TIMEOUT);
+//        this.zkClient = new ZkClient(zkAddress, Constant.ZK_SESSION_TIMEOUT, Constant.ZK_CONNECTION_TIMEOUT);
+        this.zkClient = zkClientPool.getZkClient();
         try {
             // 获取 service 节点
             String servicePath = Constant.ZK_REGISTRY_PATH + "/" + name;
@@ -58,7 +66,8 @@ public class ZooKeeperServiceDiscovery implements ServiceDiscovery {
             String addressPath = servicePath + "/" + address;
             return zkClient.readData(addressPath);
         } finally {
-            zkClient.close();
+            zkClientPool.returnObj(zkClient);
+//            zkClient.close();
         }
     }
 }
